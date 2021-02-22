@@ -1,0 +1,32 @@
+
+######### SVM - 15% test, class_weights = log, GridSearch [0.1-1] #############
+Classification report:                                                     
+                                                    precision    recall  f1-score   support
+
+                        not_related_or_irrelevant       0.71      0.94      0.81       510
+donation_needs_or_offers_or_volunteering_services       0.78      0.52      0.62       162
+                  affected_injured_or_dead_people       0.92      0.77      0.84       101
+                               caution_and_advice       0.79      0.63      0.70        94
+              infrastructure_and_utilities_damage       0.93      0.40      0.56        63
+         displaced_rescued_people_and_evacuations       0.79      0.44      0.56        50
+                  missing_trapped_or_found_people       0.88      0.37      0.52        38
+
+                                         accuracy                           0.75      1018
+                                        macro avg       0.83      0.58      0.66      1018
+                                     weighted avg       0.77      0.75      0.73      1018
+
+######### Bert - 15% test, class_weights = log, Adam with scheduler ##########
+Classification report:                                                     
+                                                    precision    recall  f1-score   support
+
+                        not_related_or_irrelevant       0.82      0.80      0.81       510
+donation_needs_or_offers_or_volunteering_services       0.67      0.67      0.67       162
+                  affected_injured_or_dead_people       0.84      0.91      0.87       101
+                               caution_and_advice       0.65      0.71      0.68        94
+              infrastructure_and_utilities_damage       0.70      0.71      0.71        63
+         displaced_rescued_people_and_evacuations       0.64      0.68      0.66        50
+                  missing_trapped_or_found_people       0.70      0.55      0.62        38
+
+                                         accuracy                           0.76      1018
+                                        macro avg       0.72      0.72      0.72      1018
+                                     weighted avg       0.76      0.76      0.76      1018
