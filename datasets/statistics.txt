@@ -1,0 +1,42 @@
+
+not_related_or_irrelevant       
+donation_needs_or_offers_or_volunteering_services      
+affected_injured_or_dead_people       
+displaced_rescued_people_and_evacuations      
+infrastructure_and_utilities_damage   
+caution_and_advice       
+missing_trapped_or_found_people     
+
+########### 2015_Nepal_Earthquake_en_CF_labeled_data ##############
+affected_injured_or_dead_people	                    362
+caution_and_advice	                                38
+displaced_rescued_people_and_evacuations	        99
+donation_needs_or_offers_or_volunteering_services	540
+infrastructure_and_utilities_damage	                101
+missing_trapped_or_found_people	                    154
+not_related_or_irrelevant	                        1709
+-----------------------------------------------------------
+Grand Total	                                        3003
+
+
+########### 2014_Pakistan_floods_CF_labeled_data ##############
+affected_injured_or_dead_people	                      234
+caution_and_advice	                                  81
+displaced_rescued_people_and_evacuations	          117
+donation_needs_or_offers_or_volunteering_services	  418
+infrastructure_and_utilities_damage	                  91
+missing_trapped_or_found_people	                      80
+not_related_or_irrelevant	                          748
+-----------------------------------------------------------
+Grand Total	                                          1769
+
+########### 2014_Philippines_Typhoon_Hagupit_en_CF_labeled_data ##############
+affected_injured_or_dead_people	                        76
+caution_and_advice	                                    505
+displaced_rescued_people_and_evacuations	            119
+donation_needs_or_offers_or_volunteering_services	    119
+infrastructure_and_utilities_damage	                    226
+missing_trapped_or_found_people	                        16
+not_related_or_irrelevant	                            949
+-----------------------------------------------------------
+Grand Total	                                            2010

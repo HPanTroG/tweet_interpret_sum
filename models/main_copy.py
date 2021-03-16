@@ -15,7 +15,6 @@ from tfidf_cls import TfidfModel
 from bert_cls import Bertweet
 from bert_mtl import BertMLTModel
 from config.config import Config
-from utils.help_functions import gather_data
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, f1_score
@@ -33,8 +32,10 @@ torch.manual_seed(54321)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
+
 def read_data(input_path, selected_columns = None, delimiter = ",", text_col = "", is_return_files=False):
     # read data
+    
     if is_return_files:
         data = []
     else:
@@ -50,11 +51,13 @@ def read_data(input_path, selected_columns = None, delimiter = ",", text_col = "
                     print("file: ", file)
                     temp_df = pd.read_csv(os.path.join(dir, file), delimiter=delimiter)
                     if selected_columns!=None: #otherwise select all columns
+                        
                         temp_df = temp_df[selected_columns]
                         if text_col!= "":
                             # temp_df[Config.text_col] = temp_df[Config.text_col].apply(lambda x: re.sub("^\'|\'$|^\"|\"$", '', x))
                             temp_df[Config.prepro_text] = temp_df[Config.text_col].apply(lambda x: tokenizeRawTweetText(x))
                             temp_df[Config.prepro_text] = temp_df[Config.prepro_text].apply(lambda x: re.sub(" +", ' ', x))
+                            print("Temp: ", temp_df.columns)
                     if is_return_files:
                         data.append(temp_df)
                     else:
@@ -66,7 +69,7 @@ if __name__ == "__main__":
 
     
     data = read_data(Config.input_path, Config.selected_columns, text_col = Config.text)
-    
+    print(data.columns)
     #merging some categories
     if Config.label_type_map!=None:
         data[Config.label] = data[Config.label].apply(lambda x: Config.label_type_map[x])
@@ -79,9 +82,8 @@ if __name__ == "__main__":
     data[Config.prepro_explan] = data[Config.prepro_explan].apply(lambda x: re.sub(" +", " ", x))
     data[Config.prepro_explan] = data[Config.prepro_explan].apply(lambda x: [y.strip() for y in x.split(Config.sep_explan_token)])
     data['len'] = data[Config.prepro_text].apply(lambda x: len(x.split(" ")))
-    print(data.shape)
-    # data = data[data['len'] >= 3]
-    # print("Data size after removing short tweets: ", data.shape)
+    data = data[data['len'] >= 3]
+    print("Data size after removing short tweets: ", data.shape)
     labels = data[Config.label].value_counts()
 
     label_idx_map = {key: i for i, key in enumerate(labels.keys())}
@@ -90,9 +92,45 @@ if __name__ == "__main__":
     
     max_classes =  float(max(dict(labels).values()))
     label_count = dict(data[Config.prepro_label].value_counts())
-    print("............")
+    if Config.add_extra_data:
+        data_extra = read_data(Config.extra_labeled_path, selected_columns=[Config.id, Config.text, Config.label])
+        
+        if Config.extra_drop_row !="":
+            data_extra = data_extra[data_extra[Config.label]!=Config.extra_drop_row]
+        
+        
+        data_extra.reset_index(drop = True, inplace=True)
+        print(data_extra.shape, len(set(data_extra[Config.id]))) 
+        #merging some categories
+        if Config.label_type_map!=None:
+            data_extra[Config.label] = data_extra[Config.label].apply(lambda x: Config.label_type_map[x])
+        print(data_extra.head(n=5))
+        data_extra[Config.prepro_text] = data_extra[Config.text].apply(lambda x: tokenizeRawTweetText(x))
+        data_extra[Config.prepro_text] = data_extra[Config.prepro_text].apply(lambda x: re.sub(" +", ' ', x))
+        data_extra[Config.prepro_label] = data_extra[Config.label].apply(lambda x: label_idx_map[x])
+        data_extra[Config.label].describe()
+        print("Extra: ", data_extra.shape)
+        print("Initial Data: ", data.shape)
+        data = pd.concat([data, data_extra])
+
+
+    dataxx = pd.DataFrame()
+    for label in set(data[Config.label]):
+        if str(label) == "not_related_or_irrelevant":
+            dataxx = pd.concat([dataxx, data[data[Config.label] == label][0:500]])
+        else:
+            dataxx = pd.concat([dataxx, data[data[Config.label]==label]])
+    data = dataxx.copy()
+    data.reset_index(drop=True, inplace=True)
+    print("Final data: ", data.shape)
+    data.to_csv(Config.data_final_path, index=False)
+    data = pd.read_csv(Config.data_final_path)
     print(data[Config.label].value_counts())
-   
+    print(len(set(data[Config.id])))
+
+
+    # sys.exit()
+    label_count = dict(data[Config.prepro_label].value_counts())
     if Config.cls_weights == 'log':
         class_weights = {i:np.log(label_count[i]) for i in range(len(label_count))}
     elif Config.cls_weights == 'balanced':
@@ -104,8 +142,6 @@ if __name__ == "__main__":
     print("Class weights: ", class_weights)
     svc = SVC(random_state = Config.random_state, class_weight = class_weights)
     model = None
-
-
     if Config.tfidf_cls:
         tfidf_text = Config.prepro_text
         if Config.tfidf_lemmatizer:
