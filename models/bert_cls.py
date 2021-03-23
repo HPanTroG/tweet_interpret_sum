@@ -13,6 +13,7 @@ import time, datetime
 import transformers
 import warnings
 import random
+import shutil
 warnings.simplefilter('ignore')
 
 
@@ -25,9 +26,9 @@ class Bertweet:
         self.num_classes = len(set(labels))
         self.device = device
         self.tokenizer = AutoTokenizer.from_pretrained(bert_config)
-        self.model = None
         self.random_state = random_state
         self.bert_config = bert_config
+        self.model = BertForSequenceClassification.from_pretrained(self.bert_config, num_labels = self.num_classes)
        
 
 
@@ -118,9 +119,11 @@ class Bertweet:
         return train_loss/n_batches
             
 
-    def cross_validate(self, n_folds = 5, train_batch_size = 64, n_epochs=20, test_batch_size = 128, class_weights = None, out = "", patience=3, idx_label_map={}):
+    def cross_validate(self, n_folds = 5, output="", train_batch_size = 64, n_epochs=20, test_batch_size = 128, class_weights = None, out = "", patience=3, idx_label_map={}, best_epoch_temp=""):
         kfold = StratifiedShuffleSplit(n_splits = n_folds, test_size = 0.3, random_state=self.random_state)
-        fold = 1
+        fold = 0
+        with open(output, "w") as f:
+            f.write(".........................................\n")
         for train_indices, test_indices in kfold.split(self.data, self.labels):
             X_train = self.data[train_indices]
             y_train = self.labels[train_indices]
@@ -156,6 +159,7 @@ class Bertweet:
             y_train = torch.tensor(y_train, dtype = torch.long).to(self.device)
             valid_loss_hist = []
             epoch = 0
+            best_epoch = 0
             while True:
                 begin_time = time.time()
                 train_loss = self.fit(X_train, y_train, train_batch_size, criterion)
@@ -163,21 +167,36 @@ class Bertweet:
                 #validation: 
                 valid_loss, valid_outputs = self.predict(X_valid, y_valid, criterion, test_batch_size, val=True)
                 print("Epoch: {}, train loss: {}. valid loss: {}, time: {}".format(epoch, train_loss, valid_loss, time.time()-begin_time))
-                epoch+=1
+                
                 improved_loss = len(valid_loss_hist)==0 or valid_loss < min(valid_loss_hist)
                 valid_loss_hist.append(valid_loss)
+                epoch+=1
                 if improved_loss:
-                    patience = 0
+                    best_epoch = epoch
+                    # self.model.save_pretrained(best_epoch_temp)
+                    # # save best model
+                    # print('Save bew best model....., epoch: ', epoch)
+                
                 else: #if valid loss did not improve
-                    patience += 1
-                    if epoch > n_epochs:
+                    if (epoch > n_epochs):
                         break
+                
             print("Training process ends!!!!")
 
+            
+            # self.model = BertForSequenceClassification.from_pretrained(best_epoch_temp)
+            # self.model.to(self.device)
             test_loss, y_pred = self.predict(X_test, y_test, criterion, batch_size = test_batch_size)
             print(confusion_matrix(y_test, y_pred, normalize = 'true'))
             print("Acc: ", accuracy_score(y_test, y_pred))
             print("Classification report: ", classification_report(y_test, y_pred, target_names =  [idx_label_map[key] for key in range(len(idx_label_map))]))
+            with open(output, "a") as f:
+                f.write("Fold: {}\n".format(fold))
+                f.write(classification_report(y_test, y_pred, target_names =  [idx_label_map[key] for key in range(len(idx_label_map))]))
+                f.write("\n.........................................\n")
+
+            # shutil.rmtree(best_epoch_temp)
+
     def train(self, test_size = 0.15, train_batch_size = 64, test_batch_size = 128, n_epochs = 5, class_weights = None):
          # train, test split
         X_train, X_test, y_train, y_test = train_test_split(self.data, self.labels, test_size = test_size, random_state = self.random_state, stratify = self.labels)

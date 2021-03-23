@@ -62,6 +62,19 @@ def read_data(input_path, selected_columns = None, delimiter = ",", text_col = "
 
     return data
 
+def extract_files(folder):
+    files = []
+    if os.path.isfile(folder):
+        files = [folder]
+    else:
+        for dir, _, filenames in os.walk(folder):
+            while len(filenames) > 0:
+                file = filenames.pop()
+                if file.endswith(".csv"):
+                    files.append(os.path.join(dir, file))
+
+    return files
+
 if __name__ == "__main__":
 
     
@@ -120,11 +133,6 @@ if __name__ == "__main__":
         
         # print("Cross validate......")
         # y_true, y_pred = model.cross_validate(cv = 5, grid_params = grid_params)
-        # print("Confusion matrix: ")
-        # print(confusion_matrix(y_true, y_pred, normalize = 'true'))
-        # print("Acc: ", accuracy_score(y_true, y_pred))
-        
-
         print(".....................")
         print("Train/test split")
         y, y_pred = model.train(test_size = Config.test_size, param_grid = Config.tfidf_grid_params)
@@ -139,7 +147,7 @@ if __name__ == "__main__":
         print("ACC:", accuracy_score(list(data[Config.prepro_label]), y_pred_train))
     if Config.bertweet: 
         model = Bertweet(list(data[Config.prepro_text]), list(data[Config.prepro_label]), bert_config =Config.bert_config,device = Config.device)
-        model.cross_validate(idx_label_map=idx_label_map, n_folds = Config.n_folds)
+        model.cross_validate(idx_label_map=idx_label_map, n_folds = Config.n_folds, output=Config.bert_seq_output, best_epoch_temp = Config.best_epoch_temp, patience=Config.patience)
         # y, y_pred = model.train(test_size = Config.test_size, n_epochs = Config.bert_seq_epochs, class_weights = class_weights)
         # print(confusion_matrix(y, y_pred, normalize = 'true'))
         # print("Acc: ", accuracy_score(y, y_pred))
@@ -149,10 +157,41 @@ if __name__ == "__main__":
         model = BertMLTModel(list(data[Config.prepro_text]), list(data[Config.prepro_label]), list(data[Config.prepro_explan]),
                         bert_config = Config.bert_config, device=Config.device, cls_hidden_size = Config.cls_hidden_size, 
                         exp_hidden_size = Config.exp_hidden_size, random_state = Config.random_state)
+
+        model.cross_validate(idx_label_map=idx_label_map, n_epochs = Config.bert_mtl_epochs, best_model_path = Config.best_mtl_path, n_folds = Config.n_folds, train_batch_size = Config.train_batch_size,
+                        test_batch_size = Config.test_batch_size, out=Config.bert_mlt_output, test_size = Config.test_size * 2, cls_weights=class_weights, exp_weights = Config.exp_weights,
+                        patience = 3, best_epoch_temp = Config.best_epoch_temp)
     
-        model.train(test_size = Config.test_size, n_epochs = Config.bert_mtl_epochs, cls_class_weights = class_weights)
+        # model.train(test_size = Config.test_size, n_epochs = Config.bert_mtl_epochs, cls_weights = class_weights, exp_weight = Config.exp_weights[0], idx_label_map= idx_label_map, model_path = Config.model_path)
         
-    
+        # model.check_explanation(saved_model = Config.best_mtl_path,idx_label_map=idx_label_map, batch_size = Config.test_batch_size)
+    if Config.new_data_prediction:
+        print("Input folder: ", Config.new_data_path)
+        files = extract_files(Config.new_data_path)
+
+        for file in files:
+            print("file: {}........".format(file))
+            new_data = pd.read_csv(file, delimiter="\t")
+            output_path = Config.classified_new_data_path+file[file.rindex("/"):]
+            print("data size: {}".format(new_data.shape))
+
+            new_data = new_data[['tweet_id', 'created_at', 'text']]
+            new_data.columns  = [Config.id, 'created_at', Config.text]
+            new_data[Config.prepro_text] = new_data[Config.text].apply(lambda x: tokenizeRawTweetText(x))
+            new_data[Config.prepro_text] = new_data[Config.prepro_text].apply(lambda x: re.sub(" +", ' ', x))
+            new_data['len'] = new_data['prepro_text'].apply(lambda x: len(x.split(" ")))
+            new_data = new_data[new_data['len']>1]
+            print("data size (after removing very short tweet len<=1): {}".format(new_data.shape))
+            model = BertMLTModel(list(new_data[Config.prepro_text]), None, None,
+                        bert_config = Config.bert_config, device=Config.device, cls_hidden_size = Config.cls_hidden_size, 
+                        exp_hidden_size = Config.exp_hidden_size, random_state = Config.random_state, n_cls_classes = len(label_idx_map))
+            model.classify_new_data(model_path= Config.model_path, input = {'id': np.array(new_data[Config.id]), 'created_at': np.array(new_data['created_at']),
+                            'text': np.array(new_data[Config.text]), 'prepro_text': np.array(new_data[Config.prepro_text])}, 
+                            output_path = output_path, batch_size = Config.test_batch_size, idx_label_map= idx_label_map)
+
+            
+
+
     if Config.tfidf_cls and Config.gather_data:
         gether_data(model, text_col = Config.prediction_data_text)
         
