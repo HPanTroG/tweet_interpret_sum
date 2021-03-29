@@ -242,6 +242,7 @@ class BertMLTModel:
             
         # exp_criterion =  torch.nn.BCEWithLogitsLoss(reduction = 'none')
         exp_criterion = self.resampling_rebalanced_crossentropy(seq_reduction = 'none')
+        result_folds = []
         print("Original data: ", len(self.data))
         for train_indices, remaining_indices in kfold.split(self.data, self.cls_labels):
             valid_indices, test_indices= train_test_split(remaining_indices, test_size =0.5, random_state=self.random_state, stratify=self.cls_labels[remaining_indices])
@@ -259,6 +260,7 @@ class BertMLTModel:
           
             best_exp_weight = -1
             best_f1 = 0.0
+            
             for exp_weight in exp_weights:
                 print("...........Exp weight: {}...................".format(exp_weight))
                 self.model = BertMTLBase(bert_config = self.bert_config, cls_hidden_size = self.cls_hidden_size, exp_hidden_size = self.exp_hidden_size, n_cls_classes = self.n_cls_classes)
@@ -291,7 +293,7 @@ class BertMLTModel:
                 exp_recall = np.mean([recall_score(y_true, y_pred) for y_true, y_pred in zip(exp_true, exp_pred) if sum(y_true)!=0])
                 cls_f1 = f1_score(valid_cls_labels, cls_pred_labels, average='macro')
                 f1 = (exp_f1 + cls_f1)/2
-
+                result_folds.append({'fold': fold, 'exp_weight': exp_weight, 'f1_mean': f1, 'cls_f1': cls_f1, 'exp_f1': exp_f1})
                 with open(out, "a") as f:
                     f.write("Fold: {}, exp_weight: {}, valid_exp_f1: {}, valid_cls_f1: {}, f1_mean: {}, valid_exp_P: {}, valid_exp_R:{}\n".format(fold, exp_weight, 
                                     exp_f1, cls_f1, f1, exp_precision, exp_recall))
@@ -334,6 +336,11 @@ class BertMLTModel:
                         f.write("exp_true: {}, {}\n".format(exp_t, ' '.join(text[i] for i in range(len(text)) if exp_t[i]==1)))
                         f.write("exp_pred: {}, {}\n".format(exp_p, ' '.join(text[i] for i in range(len(text)) if exp_p[i]==1)))
                         f.write("..................\n")
+        # result_folds = pd.DataFrame(result_folds)
+        # print(result_folds)
+        # with open(out, 'a') as f:
+        #     f.write("{}".format(result_folds))
+
 
                 
 
@@ -344,7 +351,7 @@ class BertMLTModel:
         data_indices = [i for i in range(len(self.data))]
         if test_size !=0:
             train_indices, test_indices = train_test_split(data_indices, test_size = test_size, random_state = self.random_state, stratify = self.cls_labels)
-            print(test_indices)
+            
         else:
             random.shuffle(data_indices)
             train_indices, test_indices = data_indices, data_indices
@@ -387,20 +394,22 @@ class BertMLTModel:
         exp_pred = self.max_pooling(exp_pred_labels, test_tokenized_data_slides, test_data)
 
         i = 0
-        # with open("result_exp.out", "w") as f:
-        #     for data, cls_true, cls_pred, exp_t, exp_p in zip(test_data, test_cls_labels, cls_pred_labels, exp_true, exp_pred):
-        #         f.write(data +"\n")
-        #         text = data.split(' ')
-        #         f.write("cls_true+predicted: {}-{}\n".format(cls_true, cls_pred))
-        #         f.write("exp_true: {}, {}\n".format(exp_t, ' '.join(text[i] for i in range(len(text)) if exp_t[i]==1)))
-        #         f.write("exp_pred: {}, {}\n".format(exp_p, ' '.join(text[i] for i in range(len(text)) if exp_p[i]==1)))
+        with open("result_exp.out", "w") as f:
+            for data, cls_true, cls_pred, cls_prob, exp_t, exp_p in zip(test_data, test_cls_labels, cls_pred_labels, cls_pred_probs, exp_true, exp_pred):
+                f.write(data +"\n")
+                text = data.split(' ')
+                f.write("cls_true+predicted: {}-{}, prob: {}\n".format(cls_true, cls_pred, cls_prob))
+                f.write("exp_true: {}, {}\n".format(exp_t, ' '.join(text[i] for i in range(len(text)) if exp_t[i]==1)))
+                f.write("exp_pred: {}, {}\n".format(exp_p, ' '.join(text[i] for i in range(len(text)) if exp_p[i]==1)))
                 
-        #         f.write("..................\n")
+                f.write("..................\n")
 
         print("Prediction task: ")
         print(classification_report(test_cls_labels, cls_pred_labels, target_names =  [idx_label_map[key] for key in range(len(idx_label_map))]))
         exp_f1 = np.mean([f1_score(y_true, y_pred) for y_true, y_pred in zip(exp_true, exp_pred) if sum(y_true)!=0])
-        print("Explanation task token-f1:", exp_f1)
+        exp_precision = np.mean([precision_score(y_true, y_pred) for y_true, y_pred in zip(exp_true, exp_pred) if sum(y_true)!=0])
+        exp_recall = np.mean([recall_score(y_true, y_pred) for y_true, y_pred in zip(exp_true, exp_pred) if sum(y_true)!=0])
+        print("Explanation token-f1: {}, precision: {}, recall: {}".format(exp_f1, exp_precision, exp_recall))
         
 
 
@@ -429,7 +438,7 @@ class BertMLTModel:
                 batch_end = min(batch_start+test_batch_size, len(input_ids))
                 batch_input_ids = input_ids[batch_start: batch_end]
                 batch_attention_masks = attention_masks[batch_start: batch_end]
-                print("Batch... input: {}, attention: {}\n".format(batch_input_ids.shape, batch_attention_masks.shape))
+                
                 cls_outs, exp_outs = self.model(batch_input_ids.to(self.device), batch_attention_masks.to(self.device))
                 
                 cls_outs = cls_outs.max(dim = -1)
@@ -484,7 +493,7 @@ class BertMLTModel:
         self.model.load_state_dict(params['state_dict'])
         self.model.to(self.device)
         with open(output_path, "w") as f:
-            f.write("tweet_id\tcreated_at\ttweet_text\tpredicted_labels\texplanation\n")
+            f.write("tweet_id\tcreated_at\ttweet_text\tpredicted_label\tpredicted_prob\texplanation\n")
         prepro_text = np.array(['<s> '+x+ ' </s>' for x in input['prepro_text']])
         # extract input_ids, attention_masks
         tokenized_data, input_ids, attention_masks, tokenized_data_slides = self.tokenize_text(prepro_text)
@@ -492,13 +501,13 @@ class BertMLTModel:
         tokenized_data, input_ids = np.array(tokenized_data), torch.tensor(input_ids, dtype = torch.long)
         attention_masks, tokenized_data_slides= torch.tensor(attention_masks, dtype = torch.long), np.array(tokenized_data_slides)
         
-        cls_pred, exp_pred_labels, cls_pred_prob = self.predict(input_ids, attention_masks, batch_size)
+        cls_pred, exp_pred_labels, cls_pred_probs = self.predict(input_ids, attention_masks, batch_size)
 
         exp_pred = self.max_pooling(exp_pred_labels, tokenized_data_slides, prepro_text)
 
         i = 0
         with open(output_path, "a") as f:
-            for id, created_at, txt, prepro_txt, cls_label, cls_prob, exp_label  in zip(input['id'], input['created_at'], input['text'], prepro_text, cls_pred, cls_pred_prob, exp_pred):
+            for id, created_at, txt, prepro_txt, cls_label, cls_prob, exp_label  in zip(input['id'], input['created_at'], input['text'], prepro_text, cls_pred, cls_pred_probs, exp_pred):
                 text = prepro_txt.split(" ")
                 f.write("{}\t{}\t{}\t".format(id, created_at, txt))
                 pred_exp_text = ' '.join(text[i] for i in range(len(exp_label)) if exp_label[i]==1)

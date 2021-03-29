@@ -147,7 +147,7 @@ if __name__ == "__main__":
         print("ACC:", accuracy_score(list(data[Config.prepro_label]), y_pred_train))
     if Config.bertweet: 
         model = Bertweet(list(data[Config.prepro_text]), list(data[Config.prepro_label]), bert_config =Config.bert_config,device = Config.device)
-        model.cross_validate(idx_label_map=idx_label_map, n_folds = Config.n_folds, output=Config.bert_seq_output, best_epoch_temp = Config.best_epoch_temp, patience=Config.patience)
+        model.cross_validate(idx_label_map=idx_label_map, test_size = 2*Config.test_size, n_folds = Config.n_folds, output=Config.bert_seq_output, best_epoch_temp = Config.best_epoch_temp, patience=Config.patience)
         # y, y_pred = model.train(test_size = Config.test_size, n_epochs = Config.bert_seq_epochs, class_weights = class_weights)
         # print(confusion_matrix(y, y_pred, normalize = 'true'))
         # print("Acc: ", accuracy_score(y, y_pred))

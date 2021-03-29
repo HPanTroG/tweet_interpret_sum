@@ -1,8 +1,8 @@
 class Config:
     working_directory = "/home/nguyen/tweet_interpret_sum/datasets/"
-    data_name = "2015_Nepal_Earthquake_en_CF_labeled_data_final.csv"
-    data_folder = "2015_Nepal_Earthquake_en"
-    # data_name = "2014_Philippines_Typhoon_Hagupit_en_CF_labeled_data_final.csv"
+    # data_name = "2015_Nepal_Earthquake_en_CF_labeled_data_final.csv"
+    data_folder = "2014_Philippines_Typhoon_Hagupit_en"
+    data_name = "2014_Philippines_Typhoon_Hagupit_en_CF_labeled_data_final.csv"
     input_path = working_directory+"labeled_data/"+data_name
     
     # if extra data needed
@@ -50,7 +50,7 @@ class Config:
     add_extra_data = False
     train_batch_size = 64
     test_batch_size = 128
-    n_folds = 1
+    n_folds = 5
     best_epoch_temp= working_directory +"temps/" + data_name[:-4]+".temp"
     patience = 3
 
@@ -64,21 +64,21 @@ class Config:
 
     # bert for sequence classification
     bert_seq_epochs = 20
-    bert_seq_output = working_directory +"results/"+data_name[:-4]+"_bertseq.csv"
+    bert_seq_output = working_directory +"results/"+data_name[:-4]+"_bertseq1.csv"
     
 
     #for bert mtl
     cls_hidden_size = 768
     exp_hidden_size = 768
-    bert_mtl_epochs = 2
-    # exp_weights = [i/1000 for i in range(5, 10)]+[i/100 for i in range(1, 3)]
-    exp_weights=[0.09]
-    best_mtl_path = working_directory+"saved_models/"+data_name[:-4]+"_temp.json"
-    bert_mlt_output = working_directory+"results/"+ data_name[0:-4]+"_temp.csv"
+    bert_mtl_epochs = 20
+    # exp_weights = [i/1000 for i in range(1, 10)]+[i/100 for i in range(1, 10)]
+    exp_weights=[0]
+    best_mtl_path = working_directory+"saved_models/"+data_name[:-4]+"_noexp.json"
+    bert_mlt_output = working_directory+"results/"+ data_name[0:-4]+"_noexp.csv"
 
     # new data prediction path
     model_path = working_directory+"saved_models/"+data_name[0:-4]+"_best.json"
-    new_data_path = working_directory + "unlabeled_data/"+data_folder+"/crawled_data/150425104337_nepal_earthquake_20150426_vol-8.json.csv" 
+    new_data_path = working_directory + "unlabeled_data/"+data_folder+"/crawled_data/150425104337_nepal_earthquake_20150427_vol-17.json.csv" 
     classified_new_data_path = working_directory + "unlabeled_data/"+ data_folder+"/mtl_classified_data/"
    
 
@@ -87,4 +87,6 @@ class Config:
     bertweet = False
     bert_mtl = True
     new_data_prediction = False
+
+
     

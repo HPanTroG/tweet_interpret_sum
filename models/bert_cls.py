@@ -119,8 +119,8 @@ class Bertweet:
         return train_loss/n_batches
             
 
-    def cross_validate(self, n_folds = 5, output="", train_batch_size = 64, n_epochs=20, test_batch_size = 128, class_weights = None, out = "", patience=3, idx_label_map={}, best_epoch_temp=""):
-        kfold = StratifiedShuffleSplit(n_splits = n_folds, test_size = 0.3, random_state=self.random_state)
+    def cross_validate(self, n_folds = 5, output="", test_size = 0.3, train_batch_size = 64, n_epochs=20, test_batch_size = 128, class_weights = None, out = "", patience=3, idx_label_map={}, best_epoch_temp=""):
+        kfold = StratifiedShuffleSplit(n_splits = n_folds, test_size = test_size, random_state=self.random_state)
         fold = 0
         with open(output, "w") as f:
             f.write(".........................................\n")
