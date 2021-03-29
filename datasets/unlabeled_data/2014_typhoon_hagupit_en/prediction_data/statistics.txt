@@ -1,0 +1,54 @@
+20141202-1140-PeterMosur-_20141205_vol-1.json.csv
+caution_and_advice                                     10439      0.32
+not_related_or_irrelevant                               9750      0.30
+other_useful_information                                5257      0.16
+affected_people_and_evacuations                         3521      0.11
+rescue_volunteering_and_donation_effort                 2777      0.08
+infrastructure_and_utilities_damage                     1035      0.03
+.......................................................
+20141202-1140-PeterMosur-_20141204_vol-1.json.csv
+not_related_or_irrelevant                               6978      0.31
+caution_and_advice                                      6930      0.31
+other_useful_information                                3131      0.14
+infrastructure_and_utilities_damage                     2994      0.13
+rescue_volunteering_and_donation_effort                 1579      0.07
+affected_people_and_evacuations                          892      0.04
+.......................................................
+20141202-1140-PeterMosur-_20141203_vol-1.json.csv
+caution_and_advice                                     11970      0.58
+not_related_or_irrelevant                               3228      0.16
+other_useful_information                                2237      0.11
+affected_people_and_evacuations                         1328      0.06
+rescue_volunteering_and_donation_effort                 1100      0.05
+infrastructure_and_utilities_damage                      672      0.03
+.......................................................
+
+Date: 2014/12/03
+- Data size: 20535
+- Data size(after removing duplicates): 7382
+caution_and_advice                                      3642
+infrastructure_and_utilities_damage                      247
+other_useful_information                                 781
+affected_people_and_evacuations                          452
+rescue_volunteering_and_donation_effort                  475
+not_related_or_irrelevant                               1785
+
+Date: 2014/12/04
+- Data size: 22504
+- Data size(after removing duplicates): 7180
+caution_and_advice                                      1592
+infrastructure_and_utilities_damage                      539
+other_useful_information                                 701
+rescue_volunteering_and_donation_effort                  614
+affected_people_and_evacuations                          300
+not_related_or_irrelevant                               3434
+
+Date: 2014/12/05
+- Data size: 32779
+- Data size(after removing duplicates): 10133
+caution_and_advice                                      2405
+infrastructure_and_utilities_damage                      348
+other_useful_information                                1306
+rescue_volunteering_and_donation_effort                 1111
+affected_people_and_evacuations                          826
+not_related_or_irrelevant                               4137

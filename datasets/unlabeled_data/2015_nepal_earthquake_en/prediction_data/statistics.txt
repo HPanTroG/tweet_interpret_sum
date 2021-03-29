@@ -1,0 +1,174 @@
+150425104337_nepal_earthquake_20150427_vol-16.json.csv
+not_related_or_irrelevant                              31833      0.36
+rescue_volunteering_and_donation_effort                25754      0.29
+other_useful_information                               11113      0.13
+affected_people_and_evacuations                         8171      0.09
+injured_or_dead_people                                  7817      0.09
+infrastructure_and_utilities_damage                     3337      0.04
+.......................................................
+150425104337_nepal_earthquake_20150427_vol-13.json.csv
+not_related_or_irrelevant                              22977      0.37
+rescue_volunteering_and_donation_effort                13698      0.22
+injured_or_dead_people                                  8523      0.14
+other_useful_information                                8173      0.13
+affected_people_and_evacuations                         5036      0.08
+infrastructure_and_utilities_damage                     4463      0.07
+.......................................................
+150425104337_nepal_earthquake_20150426_vol-9.json.csv
+not_related_or_irrelevant                              22438      0.36
+rescue_volunteering_and_donation_effort                14252      0.23
+injured_or_dead_people                                 10019      0.16
+other_useful_information                                7551      0.12
+affected_people_and_evacuations                         5919      0.09
+infrastructure_and_utilities_damage                     2918      0.05
+.......................................................
+150425104337_nepal_earthquake_20150426_vol-12.json.csv
+other_useful_information                               24033      0.38
+not_related_or_irrelevant                              17851      0.28
+rescue_volunteering_and_donation_effort                10910      0.17
+injured_or_dead_people                                  4897      0.08
+affected_people_and_evacuations                         3431      0.05
+infrastructure_and_utilities_damage                     2017      0.03
+.......................................................
+150425104337_nepal_earthquake_20150426_vol-7.json.csv
+not_related_or_irrelevant                              19606      0.31
+other_useful_information                               15860      0.25
+rescue_volunteering_and_donation_effort                13489      0.21
+injured_or_dead_people                                  8013      0.13
+affected_people_and_evacuations                         4689      0.07
+infrastructure_and_utilities_damage                     2308      0.04
+.......................................................
+150425104337_nepal_earthquake_20150425_vol-3.json.csv
+not_related_or_irrelevant                              18256      0.29
+injured_or_dead_people                                 15195      0.24
+rescue_volunteering_and_donation_effort                11427      0.18
+other_useful_information                                7796      0.12
+affected_people_and_evacuations                         5610      0.09
+infrastructure_and_utilities_damage                     4613      0.07
+.......................................................
+150425104337_nepal_earthquake_20150425_vol-4.json.csv
+not_related_or_irrelevant                              13616      0.36
+injured_or_dead_people                                  8532      0.22
+rescue_volunteering_and_donation_effort                 7364      0.19
+other_useful_information                                4125      0.11
+affected_people_and_evacuations                         2646      0.07
+infrastructure_and_utilities_damage                     1921      0.05
+.......................................................
+150425104337_nepal_earthquake_20150425_vol-2.json.csv
+not_related_or_irrelevant                              18408      0.29
+injured_or_dead_people                                 18040      0.28
+rescue_volunteering_and_donation_effort                10185      0.16
+other_useful_information                                9066      0.14
+affected_people_and_evacuations                         4567      0.07
+infrastructure_and_utilities_damage                     4104      0.06
+.......................................................
+150425104337_nepal_earthquake_20150425_vol-1.json.csv
+injured_or_dead_people                                 27037      0.27
+not_related_or_irrelevant                              23411      0.24
+rescue_volunteering_and_donation_effort                16641      0.17
+other_useful_information                               15810      0.16
+infrastructure_and_utilities_damage                     9712      0.10
+affected_people_and_evacuations                         6223      0.06
+.......................................................
+150425104337_nepal_earthquake_20150426_vol-11.json.csv
+not_related_or_irrelevant                              22018      0.35
+rescue_volunteering_and_donation_effort                15073      0.24
+injured_or_dead_people                                 10184      0.16
+other_useful_information                                8175      0.13
+affected_people_and_evacuations                         4597      0.07
+infrastructure_and_utilities_damage                     2311      0.04
+.......................................................
+150425104337_nepal_earthquake_20150427_vol-15.json.csv
+not_related_or_irrelevant                              22432      0.36
+rescue_volunteering_and_donation_effort                15119      0.24
+other_useful_information                                8895      0.14
+injured_or_dead_people                                  7372      0.12
+affected_people_and_evacuations                         6420      0.10
+infrastructure_and_utilities_damage                     2544      0.04
+.......................................................
+150425104337_nepal_earthquake_20150427_vol-14.json.csv
+not_related_or_irrelevant                              22129      0.35
+rescue_volunteering_and_donation_effort                15451      0.25
+other_useful_information                                7974      0.13
+injured_or_dead_people                                  7676      0.12
+affected_people_and_evacuations                         6437      0.10
+infrastructure_and_utilities_damage                     3322      0.05
+.......................................................
+150425104337_nepal_earthquake_20150427_vol-17.json.csv
+not_related_or_irrelevant                              27343      0.36
+rescue_volunteering_and_donation_effort                26583      0.35
+other_useful_information                                9694      0.13
+affected_people_and_evacuations                         5334      0.07
+injured_or_dead_people                                  4908      0.06
+infrastructure_and_utilities_damage                     2120      0.03
+.......................................................
+150425104337_nepal_earthquake_20150426_vol-10.json.csv
+not_related_or_irrelevant                              24445      0.38
+rescue_volunteering_and_donation_effort                15267      0.24
+injured_or_dead_people                                  8171      0.13
+other_useful_information                                7854      0.12
+affected_people_and_evacuations                         5426      0.09
+infrastructure_and_utilities_damage                     2331      0.04
+.......................................................
+150425104337_nepal_earthquake_20150426_vol-8.json.csv
+not_related_or_irrelevant                              23527      0.38
+rescue_volunteering_and_donation_effort                14210      0.23
+other_useful_information                                9835      0.16
+affected_people_and_evacuations                         6195      0.10
+injured_or_dead_people                                  5602      0.09
+infrastructure_and_utilities_damage                     2645      0.04
+.......................................................
+150425104337_nepal_earthquake_20150426_vol-6.json.csv
+not_related_or_irrelevant                              20687      0.34
+rescue_volunteering_and_donation_effort                15173      0.25
+injured_or_dead_people                                 11134      0.18
+other_useful_information                                5963      0.10
+affected_people_and_evacuations                         5957      0.10
+infrastructure_and_utilities_damage                     1900      0.03
+.......................................................
+150425104337_nepal_earthquake_20150426_vol-5.json.csv
+not_related_or_irrelevant                              20983      0.35
+injured_or_dead_people                                 12799      0.21
+rescue_volunteering_and_donation_effort                12643      0.21
+other_useful_information                                6584      0.11
+affected_people_and_evacuations                         5633      0.09
+infrastructure_and_utilities_damage                     1762      0.03
+.......................................................
+150425104337_nepal_earthquake_20150426_vol-4.json.csv
+not_related_or_irrelevant                              26228      0.36
+rescue_volunteering_and_donation_effort                15278      0.21
+injured_or_dead_people                                 15072      0.21
+other_useful_information                                8663      0.12
+affected_people_and_evacuations                         5684      0.08
+infrastructure_and_utilities_damage                     2327      0.03
+.......................................................
+
+Date: 20150425
+- Data size: 264305
+- Data size(after removing duplicates): 67807
+rescue_volunteering_and_donation_effort                 7129
+infrastructure_and_utilities_damage                     3946
+other_useful_information                               10045
+affected_people_and_evacuations                         5329
+injured_or_dead_people                                 13619
+not_related_or_irrelevant                              27739
+
+Date: 20150426
+- Data size: 572537
+- Data size(after removing duplicates): 144328
+rescue_volunteering_and_donation_effort                22500
+other_useful_information                               21386
+not_related_or_irrelevant                              62068
+infrastructure_and_utilities_damage                     5506
+injured_or_dead_people                                 19250
+affected_people_and_evacuations                        13618
+
+Date: 20150427
+- Data size: 352648
+- Data size(after removing duplicates): 102918
+rescue_volunteering_and_donation_effort                22977
+other_useful_information                               12689
+not_related_or_irrelevant                              42385
+infrastructure_and_utilities_damage                     3959
+injured_or_dead_people                                 10288
+affected_people_and_evacuations                        10620
