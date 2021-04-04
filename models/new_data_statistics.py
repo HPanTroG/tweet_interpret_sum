@@ -19,7 +19,7 @@ def extract_files(folder):
 
 
 if __name__ == "__main__":
-    folder = '/home/nguyen/tweet_interpret_sum/datasets/unlabeled_data/2015_Nepal_Earthquake_en/mtl_classified_data/'
+    folder = '/home/nguyen/tweet_interpret_sum/datasets/unlabeled_data/2014_Philippines_Typhoon_Hagupit_en/mtl_classified_data/'
     files = extract_files(folder)
     with open(folder+'statistics.txt', "w") as f:
         f.write("")

@@ -51,7 +51,8 @@ class Config:
     train_batch_size = 64
     test_batch_size = 128
     n_folds = 5
-    best_epoch_temp= working_directory +"temps/" + data_name[:-4]+".temp"
+    best_epoch_temp= working_directory +"temps/" + data_name[:-4]+"bertseq_modif.temp"
+    best_epoch_temp_modifiedvinai = working_directory +"temps/" + data_name[:-4]+"_modif.temp"
     patience = 3
 
     # for tfidf model
@@ -64,28 +65,37 @@ class Config:
 
     # bert for sequence classification
     bert_seq_epochs = 20
-    bert_seq_output = working_directory +"results/"+data_name[:-4]+"_bertseq1.csv"
+    bert_seq_output = working_directory +"results/"+data_name[:-4]+"_bertseq_modif.csv"
+    bert_seq_output_modifiedvinai = working_directory +"results/"+data_name[:-4]+"_bertseq_modifvinai.csv"
     
 
     #for bert mtl
     cls_hidden_size = 768
     exp_hidden_size = 768
     bert_mtl_epochs = 20
-    # exp_weights = [i/1000 for i in range(1, 10)]+[i/100 for i in range(1, 10)]
-    exp_weights=[0]
+    exp_weights = [i/1000 for i in range(1, 10)]+[i/100 for i in range(1, 10)]
+    # exp_weights=[0.01]
     best_mtl_path = working_directory+"saved_models/"+data_name[:-4]+"_noexp.json"
     bert_mlt_output = working_directory+"results/"+ data_name[0:-4]+"_noexp.csv"
-
+    best_mtl_path = working_directory+"saved_models/"+data_name[:-4]+"_mtl_modif.json"
+    bert_mlt_output = working_directory+"results/"+ data_name[0:-4]+"_mtl_modif.csv"
+    best_mtl_path_vinai = working_directory+"saved_models/"+data_name[:-4]+"mtl_vinai.json"
+    bert_mtl_out_vinai = working_directory+"results/"+ data_name[0:-4]+"_mtl_vinai.csv"
+    best_epoch_mtl_vinai = working_directory +"temps/"+data_name[:-4]+"_mtl_temp_vinai.csv"
     # new data prediction path
-    model_path = working_directory+"saved_models/"+data_name[0:-4]+"_best.json"
-    new_data_path = working_directory + "unlabeled_data/"+data_folder+"/crawled_data/150425104337_nepal_earthquake_20150427_vol-17.json.csv" 
+    
+    best_model_vinai = working_directory+"saved_models/"+data_name[0:-4]+"_best_vinai.json"
+    model_path = working_directory+"saved_models/"+data_name[0:-4]+"_best_modif.json"
+    new_data_path = working_directory + "unlabeled_data/"+data_folder+"/crawled_data/20141202-1140-PeterMosur-_20141207_vol-2.json.csv" 
     classified_new_data_path = working_directory + "unlabeled_data/"+ data_folder+"/mtl_classified_data/"
    
 
     # choose model to run
     tfidf_cls =False
     bertweet = False
-    bert_mtl = True
+    bert_mtl = False
+    bertseq= False
+    bert_seq_mtl = True
     new_data_prediction = False
 
 

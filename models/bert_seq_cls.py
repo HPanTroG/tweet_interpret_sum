@@ -5,7 +5,7 @@ from sklearn.metrics import  f1_score
 from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, StratifiedKFold, StratifiedShuffleSplit
-from transformers import AutoTokenizer,BertTokenizer, BertForSequenceClassification, AdamW
+from transformers import AutoTokenizer, BertTokenizer, BertForSequenceClassification, AdamW,AutoModelForSequenceClassification
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, f1_score
 from collections import Counter
@@ -17,18 +17,18 @@ import shutil
 warnings.simplefilter('ignore')
 
 
-class Bertweet:
+class Bertseq:
     def __init__(self, data = None, labels =None, train_data = None, train_labels = None, 
                 test_data=None, test_labels = None,bert_config='vinai/bertweet-base', device = 'cpu', random_state=12):
 
-        self.data = np.array(["[CLS] "+x  for x in data]) # add starting/ending tokens
+        self.data = np.array(["<s> "+x+" </s>"  for x in data]) # add starting/ending tokens
         self.labels = np.array(labels)
         self.num_classes = len(set(labels))
         self.device = device
-        self.tokenizer = BertTokenizer.from_pretrained(bert_config)
+        self.tokenizer = AutoTokenizer.from_pretrained(bert_config)
         self.random_state = random_state
         self.bert_config = bert_config
-        self.model = BertForSequenceClassification.from_pretrained(self.bert_config, num_labels = self.num_classes)
+        self.model = AutoModelForSequenceClassification.from_pretrained(self.bert_config, num_labels = self.num_classes)
        
 
 
@@ -49,6 +49,7 @@ class Bertweet:
         return sents_padded
 
     def convert_sents_to_ids_tensor(self, sents):
+        
         """
             :param tokenizer
             :param sents: list[str], list of untokenized sentences
@@ -59,8 +60,8 @@ class Bertweet:
         sents_lengths = torch.tensor(sents_lengths)
 
         # pad sentences
-        tokens_list_padded = self.pad_sents(tokens_list, '[PAD]')
-        masks  = np.asarray(tokens_list_padded) != '[PAD]'
+        tokens_list_padded = self.pad_sents(tokens_list, '<pad>')
+        masks  = np.asarray(tokens_list_padded) != '<pad>'
         masks_tensor = torch.tensor(masks, dtype= torch.long)
         tokens_id_list = [self.tokenizer.convert_tokens_to_ids(tokens) for tokens in tokens_list_padded]
         
@@ -140,7 +141,7 @@ class Bertweet:
 
             X_valid, X_test, y_valid, y_test = train_test_split(X_remaining, y_remaining, test_size =0.5, random_state=self.random_state, stratify=y_remaining)
 
-            self.model = BertForSequenceClassification.from_pretrained(self.bert_config, num_labels = self.num_classes)
+            self.model = AutoModelForSequenceClassification.from_pretrained(self.bert_config, num_labels = self.num_classes)
             self.model.to(self.device)
             n_batches = int(np.ceil(len(X_train)/train_batch_size))
             print("Number of batches: ", n_batches)

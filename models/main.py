@@ -9,13 +9,15 @@ import numpy as np
 import csv
 import re
 import pandas as pd 
-from utils.help_functions import text_to_exp_labels
-from utils.tweet_preprocessing import tokenizeRawTweetText
 from tfidf_cls import TfidfModel
 from bert_cls import Bertweet
 from bert_mtl import BertMLTModel
+from bert_seq_mtl import BertSeqMLTModel
+from bert_seq_cls import Bertseq
 from config.config import Config
 from utils.help_functions import gather_data
+from utils.help_functions import text_to_exp_labels
+from utils.tweet_preprocessing import tokenizeRawTweetText
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, accuracy_score, classification_report, f1_score
@@ -88,8 +90,10 @@ if __name__ == "__main__":
     data[Config.prepro_explan] = data[Config.explan].apply(lambda x: x.strip().replace('\n', Config.sep_explan_token))
     data[Config.prepro_text] = data[Config.text].apply(lambda x: tokenizeRawTweetText(x))
     data[Config.prepro_text] = data[Config.prepro_text].apply(lambda x: re.sub(" +", ' ', x))
+    data[Config.prepro_text] = data[Config.prepro_text].apply(lambda x: re.sub(" ️ ", ' ', x).strip())
     data[Config.prepro_explan] = data[Config.prepro_explan].apply(lambda x: tokenizeRawTweetText(x))
     data[Config.prepro_explan] = data[Config.prepro_explan].apply(lambda x: re.sub(" +", " ", x))
+    data[Config.prepro_explan] = data[Config.prepro_explan].apply(lambda x: re.sub(" ️ ", ' ', x).strip())
     data[Config.prepro_explan] = data[Config.prepro_explan].apply(lambda x: [y.strip() for y in x.split(Config.sep_explan_token)])
     data['len'] = data[Config.prepro_text].apply(lambda x: len(x.split(" ")))
     print(data.shape)
@@ -146,16 +150,26 @@ if __name__ == "__main__":
         print("F1: ", f1_score(list(data[Config.prepro_label]), y_pred_train, average = 'macro'))
         print("ACC:", accuracy_score(list(data[Config.prepro_label]), y_pred_train))
     if Config.bertweet: 
-        model = Bertweet(list(data[Config.prepro_text]), list(data[Config.prepro_label]), bert_config =Config.bert_config,device = Config.device)
+        model = Bertweet(list(data[Config.prepro_text]), list(data[Config.prepro_label]), bert_config ='bert-base-uncased',device = Config.device)
         model.cross_validate(idx_label_map=idx_label_map, test_size = 2*Config.test_size, n_folds = Config.n_folds, output=Config.bert_seq_output, best_epoch_temp = Config.best_epoch_temp, patience=Config.patience)
         # y, y_pred = model.train(test_size = Config.test_size, n_epochs = Config.bert_seq_epochs, class_weights = class_weights)
         # print(confusion_matrix(y, y_pred, normalize = 'true'))
         # print("Acc: ", accuracy_score(y, y_pred))
         # print("Classification report: ", classification_report(y, y_pred, target_names =  [idx_label_map[key] for key in range(len(idx_label_map))]))
-    
+    if Config.bertseq: 
+        model = Bertseq(list(data[Config.prepro_text]), list(data[Config.prepro_label]), bert_config ='vinai/bertweet-base', device = Config.device)
+        model.cross_validate(idx_label_map=idx_label_map, test_size = 2*Config.test_size, n_folds = Config.n_folds, output=Config.bert_seq_output_modifiedvinai, best_epoch_temp = Config.best_epoch_temp_modifiedvinai, patience=Config.patience)
+    if Config.bert_seq_mtl:
+        model = BertSeqMLTModel(list(data[Config.prepro_text]), list(data[Config.prepro_label]), list(data[Config.prepro_explan]),
+                        bert_config = 'vinai/bertweet-base', device=Config.device, cls_hidden_size = Config.cls_hidden_size, 
+                        exp_hidden_size = Config.exp_hidden_size, random_state = Config.random_state)
+
+        model.cross_validate(idx_label_map=idx_label_map, n_epochs = Config.bert_mtl_epochs, best_model_path = Config.best_model_vinai, n_folds = Config.n_folds, train_batch_size = Config.train_batch_size,
+                        test_batch_size = Config.test_batch_size, out=Config.bert_mtl_out_vinai, test_size = Config.test_size * 2, cls_weights=class_weights, exp_weights = Config.exp_weights,
+                        patience = 3, best_epoch_temp = Config.best_epoch_mtl_vinai)
     if Config.bert_mtl:
         model = BertMLTModel(list(data[Config.prepro_text]), list(data[Config.prepro_label]), list(data[Config.prepro_explan]),
-                        bert_config = Config.bert_config, device=Config.device, cls_hidden_size = Config.cls_hidden_size, 
+                        bert_config = 'bert-base-uncased', device=Config.device, cls_hidden_size = Config.cls_hidden_size, 
                         exp_hidden_size = Config.exp_hidden_size, random_state = Config.random_state)
 
         model.cross_validate(idx_label_map=idx_label_map, n_epochs = Config.bert_mtl_epochs, best_model_path = Config.best_mtl_path, n_folds = Config.n_folds, train_batch_size = Config.train_batch_size,
@@ -163,7 +177,7 @@ if __name__ == "__main__":
                         patience = 3, best_epoch_temp = Config.best_epoch_temp)
     
         # model.train(test_size = Config.test_size, n_epochs = Config.bert_mtl_epochs, cls_weights = class_weights, exp_weight = Config.exp_weights[0], idx_label_map= idx_label_map, model_path = Config.model_path)
-        
+    
         # model.check_explanation(saved_model = Config.best_mtl_path,idx_label_map=idx_label_map, batch_size = Config.test_batch_size)
     if Config.new_data_prediction:
         print("Input folder: ", Config.new_data_path)

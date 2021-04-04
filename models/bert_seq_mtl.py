@@ -1,6 +1,6 @@
 import numpy as np 
 import pandas as pd 
-from transformers import BertModel, AutoTokenizer, BertTokenizer, AdamW
+from transformers import BertModel, AutoModel, AutoTokenizer, BertTokenizer, AdamW
 from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
 from sklearn.metrics import classification_report, f1_score, precision_score, recall_score
 import transformers
@@ -15,7 +15,7 @@ class BertMTLBase(nn.Module):
     def __init__(self, bert_config='vinai/bertweet-base', exp_hidden_size=64, cls_hidden_size=64, n_cls_classes=2):
         super(BertMTLBase, self).__init__()
         self.bert_config = bert_config
-        self.base_bert = BertModel.from_pretrained(bert_config)
+        self.base_bert = AutoModel.from_pretrained(bert_config)
         self.exp_hidden_size = exp_hidden_size
         self.cls_hidden_size = cls_hidden_size
         self.cls_classes=n_cls_classes
@@ -74,18 +74,18 @@ class BertMTLBase(nn.Module):
         }
         torch.save(params, path)
 
-class BertMLTModel:
-    def __init__(self, data, cls_labels, exp_labels, bert_config='vinai/bertweet-base', device = 'cpu', cls_hidden_size = 768, exp_hidden_size=768, random_state=12, n_cls_classes=0):
+class BertSeqMLTModel:
+    def __init__(self, data, cls_labels, exp_labels, bert_config='bert-base-uncased', device = 'cpu', cls_hidden_size = 768, exp_hidden_size=768, random_state=12, n_cls_classes=0):
         
         self.bert_config = bert_config
         self.device = device
         self.cls_hidden_size = cls_hidden_size 
         self.exp_hidden_size = exp_hidden_size
-        self.tokenizer = BertTokenizer.from_pretrained(bert_config)
+        self.tokenizer = AutoTokenizer.from_pretrained(bert_config)
         self.device = device 
         self.random_state = random_state
         if cls_labels!=None:
-            self.data = np.array(['[CLS] '+x for x in data])
+            self.data = np.array(['<s> '+x +" </s>" for x in data])
             self.cls_labels = torch.tensor(cls_labels, dtype=torch.long)
             self.exp = exp_labels
             self.n_cls_classes = len(set(cls_labels))
@@ -149,7 +149,7 @@ class BertMLTModel:
         exp_labels = [label+[0]*(max_length-len(label)) for label in exp_labels]
         return exp_labels
 
-    def tokenize_text(self, sents, padding_token = '[PAD]'):
+    def tokenize_text(self, sents, padding_token = '<pad>'):
         """
             :param sents: list[str], list of untokenized sentences
             @return: tokenized_lists: list[str], list of tokenized tokens
@@ -165,11 +165,11 @@ class BertMLTModel:
             start_w = 0
             for w in sent.split(" "):
                 tokenized = self.tokenizer.tokenize(w)
-                if start_w+len(tokenized)>= 130:
-                    # tokens.extend(self.tokenizer.tokenize("</s>"))
-                    # end_w = len(tokens)
-                    # spans.append((start_w, end_w))
-                    break
+                # if start_w+len(tokenized)>= 130:
+                #     # tokens.extend(self.tokenizer.tokenize("</s>"))
+                #     # end_w = len(tokens)
+                #     # spans.append((start_w, end_w))
+                #     break
                 tokens.extend(tokenized)
                 end_w = len(tokens)
                 spans.append((start_w, end_w))
@@ -415,19 +415,14 @@ class BertMLTModel:
 
     def max_pooling(self, y_values, data_slides, data):
         pooled_values = []
-        
-        for y, y_slides, data in zip(y_values, data_slides, data):
-            try:
-                pooled_y = []
-                for tup in y_slides:
 
-                    pooled_y.append(int(max(y[tup[0]:tup[1]])))
-                pooled_values.append(pooled_y)
-            except Exception as e:
-                print(e)
-                print("data: ", data)
-                print("y: ", y)
-                print("y_slides: ", y_slides)
+        for y, y_slides, data in zip(y_values, data_slides, data):
+            pooled_y = []
+            for tup in y_slides:
+
+                pooled_y.append(int(max(y[tup[0]:tup[1]])))
+            pooled_values.append(pooled_y)
+        
         return pooled_values
 
     def predict(self, input_ids, attention_masks, test_batch_size):
